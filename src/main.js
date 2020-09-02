@@ -1,6 +1,4 @@
-//console.log('hiu ti');
-
-let {
+import {
   init,
   Sprite,
   GameLoop,
@@ -8,31 +6,15 @@ let {
   load,
   dataAssets,
   initKeys,
-  keyPressed,
-} = kontra;
+} from "kontra";
 
-let {
-  canvas,
-  context
-} = init();
+let { canvas, context } = init();
 
 console.log(canvas);
 console.log(context);
 
 // увеличиваем скейл что бы тайл мап помещался в игровое поле
 context.scale(3, 3);
-
-initKeys();
-
-let eventHandler = function (event) {
-  console.log('key Pressed');
-  if (event.key === 'ArrowRight') {
-    console.log('Right pressed');
-  }
-  document.removeEventListener('keydown', eventHandler);
-}
-
-document.addEventListener('keydown', eventHandler);
 
 /*
 document.addEventListener("keydown", event => {
@@ -52,20 +34,18 @@ document.addEventListener("keydown", event => {
 })
 */
 
-
-
-load('assets/js13kb-tileset.png', 'assets/ground.json').then(function (assets) {
-  let data = dataAssets['assets/ground'];
+load("assets/js13kb-tileset.png", "assets/ground.json").then(function (assets) {
+  let data = dataAssets["assets/ground"];
   // A hack to fix a bug in kontra engine
   // when it can't read tileset from the JSON file
   data.tilesets[0] = {
     firstgid: 1,
-    image: assets[0]
+    image: assets[0],
   };
   let tileEngine = TileEngine(data);
 
   let img = new Image();
-  img.src = '/assets/hero.png';
+  img.src = "/assets/hero.png";
 
   let player = Sprite({
     x: 0,
@@ -79,8 +59,12 @@ load('assets/js13kb-tileset.png', 'assets/ground.json').then(function (assets) {
 
   //tileEngine.addObject(player);
 
+  initKeys();
 
-
+  bindKeys(["d", "right_arrow"], function (e) {
+    e.preventDefault();
+    player.x += 34;
+  });
 
   //const isCollide = tileEngine.layerCollidesWith('collision_objects', player);
   //console.log(isCollide);
@@ -99,7 +83,7 @@ load('assets/js13kb-tileset.png', 'assets/ground.json').then(function (assets) {
       }
       */
 
-      if (tileEngine.layerCollidesWith('collision_objects', player)) {
+      if (tileEngine.layerCollidesWith("collision_objects", player)) {
         //player.x = 0;
         //console.log('THIS IS COLLISION');
         //console.log(isCollide);
@@ -108,15 +92,11 @@ load('assets/js13kb-tileset.png', 'assets/ground.json').then(function (assets) {
     render: function () {
       tileEngine.render();
       player.render();
-    }
+    },
   });
 
   loop.start();
 });
-
-
-
-
 
 //let sprite2 = null;
 
@@ -134,7 +114,6 @@ load('assets/js13kb-tileset.png', 'assets/ground.json').then(function (assets) {
 // });
 //sprite2.render();
 // console.log(sprite2);
-
 
 /*
 let img = new Image();
