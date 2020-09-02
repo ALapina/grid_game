@@ -61,11 +61,6 @@ load("assets/js13kb-tileset.png", "assets/ground.json").then(function (assets) {
 
   initKeys();
 
-  bindKeys(["d", "right_arrow"], function (e) {
-    e.preventDefault();
-    player.x += 34;
-  });
-
   //const isCollide = tileEngine.layerCollidesWith('collision_objects', player);
   //console.log(isCollide);
 

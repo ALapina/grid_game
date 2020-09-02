@@ -5,9 +5,9 @@
   "description": "A game about treasure hunting",
   "main": "index.js",
   "scripts": {
-    "dev": "rollup --config --watch",
+    "dev": "NODE_ENV=dev rollup --config --watch",
     "format": "prettier --write .",
-    "build": "rollup --config"
+    "build": "NODE_ENV=production rollup -c --environment INCLUDE_DEPS,BUILD:production"
   },
   "repository": {
     "type": "git",
@@ -35,13 +35,12 @@
   },
   "homepage": "https://github.com/ALapina/grid_game#readme",
   "devDependencies": {
-    "@babel/core": "^7.11.5",
-    "@babel/preset-env": "^7.11.5",
-    "@rollup/plugin-babel": "^5.2.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
     "prettier": "^2.1.1",
     "rollup": "^2.26.9",
-    "rollup-plugin-serve": "^1.0.4"
+    "rollup-plugin-filesize": "^9.0.2",
+    "rollup-plugin-serve": "^1.0.4",
+    "rollup-plugin-terser": "^7.0.1"
   },
   "dependencies": {
     "kontra": "^7.1.2"
