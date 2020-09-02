@@ -1,0 +1,49 @@
+{
+  "name": "grid_game",
+  "private": true,
+  "version": "1.0.0",
+  "description": "A game about treasure hunting",
+  "main": "index.js",
+  "scripts": {
+    "dev": "rollup --config --watch",
+    "format": "prettier --write .",
+    "build": "rollup --config"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ALapina/grid_game.git"
+  },
+  "keywords": [
+    "treasure",
+    "kontra",
+    "js13k"
+  ],
+  "author": "Anna Lapina",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ALapina/grid_game/issues"
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/env",
+        {
+          "modules": false
+        }
+      ]
+    ]
+  },
+  "homepage": "https://github.com/ALapina/grid_game#readme",
+  "devDependencies": {
+    "@babel/core": "^7.11.5",
+    "@babel/preset-env": "^7.11.5",
+    "@rollup/plugin-babel": "^5.2.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "prettier": "^2.1.1",
+    "rollup": "^2.26.9",
+    "rollup-plugin-serve": "^1.0.4"
+  },
+  "dependencies": {
+    "kontra": "^7.1.2"
+  }
+}
