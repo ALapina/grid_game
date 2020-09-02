@@ -3,11 +3,10 @@
   "private": true,
   "version": "1.0.0",
   "description": "A game about treasure hunting",
-  "main": "index.js",
   "scripts": {
-    "dev": "rollup --config --watch",
+    "dev": "webpack-dev-server",
     "format": "prettier --write .",
-    "build": "rollup --config"
+    "build": "webpack --mode=production --optimize-minimize"
   },
   "repository": {
     "type": "git",
@@ -23,25 +22,13 @@
   "bugs": {
     "url": "https://github.com/ALapina/grid_game/issues"
   },
-  "babel": {
-    "presets": [
-      [
-        "@babel/env",
-        {
-          "modules": false
-        }
-      ]
-    ]
-  },
   "homepage": "https://github.com/ALapina/grid_game#readme",
   "devDependencies": {
-    "@babel/core": "^7.11.5",
-    "@babel/preset-env": "^7.11.5",
-    "@rollup/plugin-babel": "^5.2.0",
-    "@rollup/plugin-node-resolve": "^9.0.0",
+    "html-webpack-plugin": "^4.4.1",
     "prettier": "^2.1.1",
-    "rollup": "^2.26.9",
-    "rollup-plugin-serve": "^1.0.4"
+    "webpack": "^5.0.0-beta.29",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
     "kontra": "^7.1.2"

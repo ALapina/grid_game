@@ -6,6 +6,7 @@ import {
   load,
   dataAssets,
   initKeys,
+  bindKeys,
 } from "kontra";
 
 let { canvas, context } = init();
