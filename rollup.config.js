@@ -1,6 +1,5 @@
 import serve from "rollup-plugin-serve";
 import { terser } from "rollup-plugin-terser";
-import filesize from "rollup-plugin-filesize";
 import resolve from "@rollup/plugin-node-resolve";
 
 const config = {
@@ -13,12 +12,16 @@ const config = {
 };
 
 if (process.env.NODE_ENV === "dev") {
-  config.plugins.push(serve({ open: true, port: 3000 }));
+  config.plugins.push(
+    serve({
+      open: true,
+      port: 3000,
+    })
+  );
 }
 
 if (process.env.NODE_ENV == "production") {
   config.plugins.push(terser());
-  config.plugins.push(filesize());
 }
 
 export default config;
