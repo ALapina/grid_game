@@ -24,6 +24,8 @@ const TILE_SIZE = 32;
 const TILE_MAP_WIDTH = 7;
 
 
+
+
 load("assets/js13kb-tileset.png", "assets/ground.json").then(function (assets) {
   let data = dataAssets["assets/ground"];
   // A hack to fix a bug in kontra engine
@@ -36,6 +38,27 @@ load("assets/js13kb-tileset.png", "assets/ground.json").then(function (assets) {
 
   let img = new Image();
   img.src = "/assets/hero.png";
+
+  let objectsOnMap = new Array();
+
+  let imgArray = new Array();
+
+  imgArray[0] = new Image();
+  imgArray[0].src = "/assets/hole.png";
+
+  imgArray[1] = new Image();
+  imgArray[1].src = "/assets/money.png";
+
+  imgArray[2] = new Image();
+  imgArray[2].src = "/assets/chest.png";
+
+  imgArray[3] = new Image();
+  imgArray[3].src = "/assets/bomb.png";
+
+  imgArray[4] = new Image();
+  imgArray[4].src = "/assets/webdeveloper.png";
+
+  console.log(imgArray);
 
   let player = Sprite({
     x: TILE_SIZE * 3,
@@ -80,8 +103,27 @@ load("assets/js13kb-tileset.png", "assets/ground.json").then(function (assets) {
 
   }
 
-  function dig(player, ) {
+  function dig(player) {
 
+    for (let element of objectsOnMap) {
+      if (player.x === element.x && player.y === element.y) {
+        return;
+      }
+    }
+
+    // console.log(objectsOnMap.map(function (element) {
+    //   return [element.x, element.y]
+    // }));
+
+    let randomNUmber = Math.floor(Math.random() * imgArray.length);
+    //console.log(randomNUmber);
+    let item = Sprite({
+      x: player.x,
+      y: player.y,
+      image: imgArray[randomNUmber],
+    });
+    //console.log(item);
+    objectsOnMap.push(item);
   }
 
 
@@ -98,17 +140,16 @@ load("assets/js13kb-tileset.png", "assets/ground.json").then(function (assets) {
     movePlayer(player, player.x + 32, player.y);
   });
   bindKeys('space', function (e) {
-    console.log('SPACE');
-    dig();
+    dig(player);
   })
-
-  //const isCollide = tileEngine.layerCollidesWith('collision_objects', player);
-  //console.log(isCollide);
 
   let loop = GameLoop({
     update: function () {},
     render: function () {
       tileEngine.render();
+      objectsOnMap.forEach(element => {
+        element.render();
+      });
       player.render();
     },
   });
