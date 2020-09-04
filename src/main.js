@@ -31,12 +31,21 @@ let is_victory = false;
 let game_state = GAME_STATE_START_SCREEN;
 let objectsOnMap = [];
 
-const startGameText = makeTextNode("Start Game", 32, 0, 100);
+const startGameText = makeTextNode("Treasure Hunter", 32, 0, 100);
 const pressToStart = makeTextNode("Press ENTER to start the game", 12, 0, 200);
-const playScoreText = makeTextNode("Score: 100", 8, 10, 10, "left", "black");
+const playScoreText = makeTextNode(
+  `Score: ${score}`,
+  8,
+  10,
+  10,
+  "left",
+  "black"
+);
+playScoreText.update = () => (playScoreText.text = "Score: " + score);
 const gameOverText = makeTextNode("Game Over!", 32, 0, 100);
 const gameVictoryText = makeTextNode("Victory!", 32, 0, 100);
-const finalScoreText = makeTextNode("Your Score: 100", 18, 0, 130);
+const finalScoreText = makeTextNode(`Your Score: ${score}`, 18, 0, 130);
+finalScoreText.update = () => (finalScoreText.text = "Your Score: " + score);
 
 load("assets/js13kb-tileset.png", "assets/hero.png", "assets/ground.json").then(
   function (assets) {
@@ -95,9 +104,14 @@ load("assets/js13kb-tileset.png", "assets/hero.png", "assets/ground.json").then(
           movePlayer(tileEngine, player, player.x + TILE_SIZE, player.y);
         });
         bindKeys("space", function () {
-          const treasure = digTreasure(player, objectsOnMap, imgArray);
-          if (treasure) {
-            GameBackground.addChild(treasure);
+          const { islandItem, itemScore } = digTreasure(
+            player,
+            objectsOnMap,
+            imgArray
+          );
+          if (islandItem) {
+            GameBackground.addChild(islandItem);
+            score += itemScore;
           }
         });
       },
@@ -132,7 +146,23 @@ load("assets/js13kb-tileset.png", "assets/hero.png", "assets/ground.json").then(
 
     const loop = GameLoop({
       fps: 15,
-      update: function () {},
+      update: function () {
+        switch (game_state) {
+          case GAME_STATE_START_SCREEN:
+            StartGameScene.update();
+            break;
+          case GAME_STATE_VICTORY:
+            GameVictoryScene.update();
+            break;
+          case GAME_STATE_GAME_OVER:
+            GameOverScene.update();
+            break;
+          case GAME_STATE_PLAY:
+            GameBackground.update();
+            GameForeground.update();
+            break;
+        }
+      },
       render: function () {
         screens.forEach((screen) => screen.hide());
 

@@ -34,12 +34,12 @@ function movePlayer(tileEngine, player, x, y) {
  * @param {object} player
  * @param {Array} objectsOnMap - Visible objects on the island
  * @param {Array} imgArray - List of images of items that can be placed on the map
- * @returns {Array}
+ * @returns {object}
  */
 function digTreasure(player, objectsOnMap, imgArray) {
   for (let element of objectsOnMap) {
     if (player.x === element.x && player.y === element.y) {
-      return;
+      return {};
     }
   }
 
@@ -47,10 +47,10 @@ function digTreasure(player, objectsOnMap, imgArray) {
   let item = Sprite({
     x: player.x,
     y: player.y,
-    image: imgArray[randomNUmber],
+    image: imgArray[randomNUmber].image,
   });
   objectsOnMap.push(item);
-  return item;
+  return { islandItem: item, itemScore: imgArray[randomNUmber].score };
 }
 
 export { movePlayer, digTreasure };
