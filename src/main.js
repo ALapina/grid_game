@@ -1,5 +1,4 @@
 import {
-  init,
   Sprite,
   GameLoop,
   TileEngine,
@@ -7,152 +6,160 @@ import {
   dataAssets,
   initKeys,
   bindKeys,
+  init,
+  Scene,
 } from "kontra";
+import { TILE_SIZE, TILE_MAP_SIZE, GAME_STATE_VICTORY } from "./constants";
+import {
+  GAME_STATE_START_SCREEN,
+  GAME_STATE_PLAY,
+  GAME_STATE_GAME_OVER,
+} from "./constants";
+import { makeTextNode } from "./utils";
+import imgArray from "./items";
+import { movePlayer, digTreasure } from "./player";
 
-let {
-  canvas,
-  context
-} = init();
-
-console.log(canvas);
-console.log(context);
+let { context } = init("game");
+initKeys();
 
 // увеличиваем скейл что бы тайл мап помещался в игровое поле
 context.scale(3, 3);
 
-const TILE_SIZE = 32;
-const TILE_MAP_WIDTH = 7;
+let score = 0;
+let is_failure = false;
+let is_victory = false;
+let game_state = GAME_STATE_START_SCREEN;
+let objectsOnMap = [];
 
+const startGameText = makeTextNode("Start Game", 32, 0, 100);
+const pressToStart = makeTextNode("Press ENTER to start the game", 12, 0, 200);
+const playScoreText = makeTextNode("Score: 100", 8, 10, 10, "left", "black");
+const gameOverText = makeTextNode("Game Over!", 32, 0, 100);
+const gameVictoryText = makeTextNode("Victory!", 32, 0, 100);
+const finalScoreText = makeTextNode("Your Score: 100", 18, 0, 130);
 
-
-
-load("assets/js13kb-tileset.png", "assets/ground.json").then(function (assets) {
-  let data = dataAssets["assets/ground"];
-  // A hack to fix a bug in kontra engine
-  // when it can't read tileset from the JSON file
-  data.tilesets[0] = {
-    firstgid: 1,
-    image: assets[0],
-  };
-  let tileEngine = TileEngine(data);
-
-  let img = new Image();
-  img.src = "/assets/hero.png";
-
-  let objectsOnMap = new Array();
-
-  let imgArray = new Array();
-
-  imgArray[0] = new Image();
-  imgArray[0].src = "/assets/hole.png";
-
-  imgArray[1] = new Image();
-  imgArray[1].src = "/assets/money.png";
-
-  imgArray[2] = new Image();
-  imgArray[2].src = "/assets/chest.png";
-
-  imgArray[3] = new Image();
-  imgArray[3].src = "/assets/bomb.png";
-
-  imgArray[4] = new Image();
-  imgArray[4].src = "/assets/webdeveloper.png";
-
-  console.log(imgArray);
-
-  let player = Sprite({
-    x: TILE_SIZE * 3,
-    y: TILE_SIZE * (TILE_MAP_WIDTH - 1),
-    // anchor: {
-    //   x: 0.5,
-    //   y: 0.5
-    // },
-    image: img,
-  });
-
-  initKeys();
-
-  function movePlayer(player, x, y) {
-    const nextPlayerPosition = {
-      x: x,
-      y: y,
-      width: player.width,
-      height: player.height,
+load("assets/js13kb-tileset.png", "assets/hero.png", "assets/ground.json").then(
+  function (assets) {
+    let data = dataAssets["assets/ground"];
+    // A hack to fix a bug in kontra engine
+    // when it can't read tileset from the JSON file
+    data.tilesets[0] = {
+      firstgid: 1,
+      image: assets[0],
     };
-    if (nextPlayerPosition.x > TILE_SIZE * TILE_MAP_WIDTH) {
-      return;
-    }
-    if (nextPlayerPosition.x < 0) {
-      return;
-    }
-    if (nextPlayerPosition.y > TILE_SIZE * TILE_MAP_WIDTH) {
-      return;
-    }
-    if (nextPlayerPosition.y < 0) {
-      return;
-    }
-    if (tileEngine.layerCollidesWith("collision_objects", nextPlayerPosition)) {
-      //console.log('THIS IS COLLISION');
-      return;
-    } else {
-      player.y = y;
-      player.x = x;
-      //console.log('good');
-    }
-
-
-  }
-
-  function dig(player) {
-
-    for (let element of objectsOnMap) {
-      if (player.x === element.x && player.y === element.y) {
-        return;
-      }
-    }
-
-    // console.log(objectsOnMap.map(function (element) {
-    //   return [element.x, element.y]
-    // }));
-
-    let randomNUmber = Math.floor(Math.random() * imgArray.length);
-    //console.log(randomNUmber);
-    let item = Sprite({
-      x: player.x,
-      y: player.y,
-      image: imgArray[randomNUmber],
+    const tileEngine = TileEngine(data);
+    const player = Sprite({
+      x: TILE_SIZE * 3,
+      y: TILE_SIZE * (TILE_MAP_SIZE - 1),
+      image: assets[1],
     });
-    //console.log(item);
-    objectsOnMap.push(item);
+
+    const StartGameScene = Scene({
+      id: "start-game",
+      children: [startGameText, pressToStart],
+      onShow() {
+        score = 0;
+        bindKeys("enter", () => {
+          game_state = GAME_STATE_PLAY;
+        });
+      },
+    });
+
+    const GameBackground = Scene({
+      id: "game-background",
+      children: [tileEngine],
+      cullObjects: false,
+    });
+
+    const GameForeground = Scene({
+      id: "game-foreground",
+      children: [player, playScoreText],
+      update() {
+        if (is_failure) {
+          game_state = GAME_STATE_GAME_OVER;
+        } else if (is_victory) {
+          game_state = GAME_STATE_VICTORY;
+        }
+      },
+      onShow() {
+        bindKeys("up", function () {
+          movePlayer(tileEngine, player, player.x, player.y - TILE_SIZE);
+        });
+        bindKeys("down", function () {
+          movePlayer(tileEngine, player, player.x, player.y + TILE_SIZE);
+        });
+        bindKeys("left", function (e) {
+          movePlayer(tileEngine, player, player.x - TILE_SIZE, player.y);
+        });
+        bindKeys("right", function () {
+          movePlayer(tileEngine, player, player.x + TILE_SIZE, player.y);
+        });
+        bindKeys("space", function () {
+          const treasure = digTreasure(player, objectsOnMap, imgArray);
+          if (treasure) {
+            GameBackground.addChild(treasure);
+          }
+        });
+      },
+    });
+
+    const GameOverScene = Scene({
+      id: "game-over",
+      children: [gameOverText, finalScoreText, pressToStart],
+      onShow() {
+        bindKeys("enter", () => {
+          game_state = GAME_STATE_START_SCREEN;
+        });
+      },
+    });
+
+    const GameVictoryScene = Scene({
+      id: "victory",
+      children: [gameVictoryText, finalScoreText, pressToStart],
+      onShow() {
+        bindKeys("enter", () => {
+          game_state = GAME_STATE_START_SCREEN;
+        });
+      },
+    });
+
+    const screens = [
+      StartGameScene,
+      GameBackground,
+      GameOverScene,
+      GameVictoryScene,
+    ];
+
+    const loop = GameLoop({
+      fps: 15,
+      update: function () {},
+      render: function () {
+        screens.forEach((screen) => screen.hide());
+
+        switch (game_state) {
+          case GAME_STATE_START_SCREEN:
+            StartGameScene.show();
+            StartGameScene.render();
+            break;
+          case GAME_STATE_VICTORY:
+            GameVictoryScene.show();
+            GameVictoryScene.render();
+            break;
+          case GAME_STATE_GAME_OVER:
+            GameOverScene.show();
+            GameOverScene.render();
+            break;
+          case GAME_STATE_PLAY:
+            GameBackground.show();
+            GameForeground.show();
+            GameBackground.render();
+            GameForeground.render();
+            break;
+        }
+      },
+      context: context,
+    });
+
+    loop.start();
   }
-
-
-  bindKeys('up', function (e) {
-    movePlayer(player, player.x, player.y - 32);
-  });
-  bindKeys('down', function (e) {
-    movePlayer(player, player.x, player.y + 32);
-  });
-  bindKeys('left', function (e) {
-    movePlayer(player, player.x - 32, player.y);
-  });
-  bindKeys('right', function (e) {
-    movePlayer(player, player.x + 32, player.y);
-  });
-  bindKeys('space', function (e) {
-    dig(player);
-  })
-
-  let loop = GameLoop({
-    update: function () {},
-    render: function () {
-      tileEngine.render();
-      objectsOnMap.forEach(element => {
-        element.render();
-      });
-      player.render();
-    },
-  });
-
-  loop.start();
-});
+);
