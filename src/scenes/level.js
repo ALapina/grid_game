@@ -1,9 +1,11 @@
+/* Screen with the Game level */
 import { GameLoop, bindKeys, load, dataAssets, Sprite } from "kontra";
-import { TILE_SIZE, TILE_MAP_SIZE } from "../constants";
+import { TILE_SIZE, TILE_MAP_SIZE } from "../config";
 import { makeTextNode } from "../utils";
 import initLeveltileset from "../tiles";
 import imgArray from "../items";
 import { movePlayer, digTreasure } from "../player";
+import GameOver from "./over";
 
 const imgPath = "assets/";
 const assets = ["js13kb-tileset.png", "hero.png", "ground.json"].map(
@@ -14,7 +16,7 @@ const Level = (game) => {
   const playScoreText = makeTextNode("", 8, 10, 10, "left", "black");
   playScoreText.update = () => (playScoreText.text = "Score: " + game.score);
 
-  let objectsOnMap = [];
+  let foundItems = [];
 
   load(...assets).then((assets) => {
     let data = dataAssets["assets/ground"];
@@ -28,10 +30,15 @@ const Level = (game) => {
     const loop = GameLoop({
       update() {
         playScoreText.update();
+        if (game.score < 0) {
+          game.score = 0;
+          loop.stop();
+          GameOver(game);
+        }
       },
       render() {
         tileEngine.render();
-        for (let item of objectsOnMap) {
+        for (let item of foundItems) {
           item.render();
         }
         player.render();
@@ -55,11 +62,11 @@ const Level = (game) => {
     bindKeys("space", function () {
       const { islandItem, itemScore } = digTreasure(
         player,
-        objectsOnMap,
+        foundItems,
         imgArray
       );
       if (islandItem) {
-        objectsOnMap.push(islandItem);
+        foundItems.push(islandItem);
         game.score += itemScore;
       }
     });

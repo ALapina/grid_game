@@ -1,5 +1,5 @@
 import { Text } from "kontra";
-import { SCREEN_SIZE_PX } from "./constants";
+import { SCREEN_SIZE_PX } from "./config";
 
 /**
  * Creates new text object

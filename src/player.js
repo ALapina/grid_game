@@ -1,5 +1,5 @@
 import { Sprite } from "kontra";
-import { TILE_SIZE, TILE_MAP_SIZE } from "./constants";
+import { TILE_SIZE, TILE_MAP_SIZE } from "./config";
 
 function movePlayer(tileEngine, player, x, y) {
   const nextPlayerPosition = {
@@ -32,24 +32,24 @@ function movePlayer(tileEngine, player, x, y) {
  * Treasure hunter dig a random treasure or empty space
  *
  * @param {object} player
- * @param {Array} objectsOnMap - Visible objects on the island
+ * @param {Array} foundItems - Visible objects on the island
  * @param {Array} imgArray - List of images of items that can be placed on the map
  * @returns {object}
  */
-function digTreasure(player, objectsOnMap, imgArray) {
-  for (let element of objectsOnMap) {
-    if (player.x === element.x && player.y === element.y) {
+function digTreasure(player, foundItems, imgArray) {
+  // First we check that this tile does not contain items already
+  for (let item of foundItems) {
+    if (player.x === item.x && player.y === item.y) {
       return {};
     }
   }
-
+  // Next we will add a random item from the pool to the tile
   let randomNUmber = Math.floor(Math.random() * imgArray.length);
   let item = Sprite({
     x: player.x,
     y: player.y,
     image: imgArray[randomNUmber].image,
   });
-  objectsOnMap.push(item);
   return { islandItem: item, itemScore: imgArray[randomNUmber].score };
 }
 
